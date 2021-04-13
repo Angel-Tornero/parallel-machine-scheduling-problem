@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   algorithm->solve(pmsp);
   auto stop = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = stop - start;
-  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() << " ms\n";
+  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
   algorithm->solve(pmsp);
   stop = std::chrono::high_resolution_clock::now();
   elapsed = stop - start;
-  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() << " ms\n";
+  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
   algorithm->solve(pmsp);
   stop = std::chrono::high_resolution_clock::now();
   elapsed = stop - start;
-  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() << " ms\n";
+  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
   delete algorithm;
   
   return 1;
