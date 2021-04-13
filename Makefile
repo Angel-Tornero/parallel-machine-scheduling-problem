@@ -4,7 +4,7 @@ LDFLAGS =  -fsanitize=address
 
 SRC = $(wildcard src/*.cc)
 OBJ = $(SRC:.cc=.o)
-EXEC = bin/main
+EXEC = main
 
 all: $(EXEC)
 
