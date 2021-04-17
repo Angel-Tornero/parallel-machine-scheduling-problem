@@ -15,12 +15,24 @@
 #include "../include/Machine.h"
 #include <iostream>
 
+Machine::Machine() {
+  assignedTasks_ = 0;
+}
+
 Machine::Machine(std::vector<Task*> tasks) {
   machineTasks_ = tasks;
+  assignedTasks_ = tasks.size();
+}
+
+Machine::~Machine() {
+  for (int i = 0; i < machineTasks_.size(); i++) {
+    delete machineTasks_[i];
+  }
 }
 
 void Machine::addTask(Task* task) {
   machineTasks_.push_back(task);
+  assignedTasks_++;
 }
 
 void Machine::insertTask(Task* task, int pos) {
@@ -29,6 +41,7 @@ void Machine::insertTask(Task* task, int pos) {
     machineTasks_[i] = machineTasks_[i - 1];
   }
   machineTasks_[pos] = task;
+  assignedTasks_++;
 }
 
 int Machine::assignedTasks() {
@@ -37,4 +50,79 @@ int Machine::assignedTasks() {
 
 std::vector<Task*> Machine::getTaskArray() {
   return machineTasks_;
+}
+
+int Machine::taskArraySize() {
+  return assignedTasks_;
+}
+
+void Machine::unassignTask(int position) {
+  machineTasks_.erase(machineTasks_.begin() + position);
+  assignedTasks_--;
+}
+
+void Machine::reinsertTask(Task* task, int pos) {
+  bool found = false;
+  for (int i = 0; i < machineTasks_.size(); i++) {
+    if (task == machineTasks_[i]) {
+      machineTasks_.erase(machineTasks_.begin() + i);
+      found = true;
+      break;
+    }
+  }
+  if (found) insertTask(task, pos);
+}
+
+void Machine::intermachineTaskReinsertion(Task* task, Machine* machine, int pos) {
+  bool found = false;
+  for (int i = 0; i < machineTasks_.size(); i++) {
+    if (task == machineTasks_[i]) {
+      machineTasks_.erase(machineTasks_.begin() + i);
+      found = true;
+      break;
+    }
+  }
+  if (found) machine->insertTask(task, pos);
+}
+
+void Machine::swapTask(Task* taskA, Task* taskB) {
+  int i, j;
+  bool foundA = false;
+  bool foundB = false;
+  for (i = 0; i < machineTasks_.size(); i++) {
+    if (taskA == machineTasks_[i]) {
+      foundA = true;
+      break;
+    }
+  }
+  for (j = 0; j < machineTasks_.size(); j++) {
+    if (taskB == machineTasks_[j]) {
+      foundB = true;
+      break;
+    }
+  }
+  if (foundA && foundB) {
+    std::swap(machineTasks_[i], machineTasks_[j]);
+  }
+}
+
+void Machine::intermachineTaskSwap(Task* taskA, Machine* machineB, Task* taskB) {
+  int i, j;
+  bool foundA = false;
+  bool foundB = false;
+  for (i = 0; i < machineTasks_.size(); i++) {
+    if (taskA == machineTasks_[i]) {
+      foundA = true;
+      break;
+    }
+  }
+  for (j = 0; j < machineB->machineTasks_.size(); j++) {
+    if (taskB == machineB->machineTasks_[j]) {
+      foundB = true;
+      break;
+    }
+  }
+  if (foundA && foundB) {
+    std::swap(machineTasks_[i], machineB->machineTasks_[j]);
+  }
 }
