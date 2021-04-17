@@ -15,24 +15,12 @@
 #include "../include/Machine.h"
 #include <iostream>
 
-Machine::Machine() {
-  assignedTasks_ = 0;
-}
-
 Machine::Machine(std::vector<Task*> tasks) {
   machineTasks_ = tasks;
-  assignedTasks_ = tasks.size();
-}
-
-Machine::~Machine() {
-  for (int i = 0; i < machineTasks_.size(); i++) {
-    delete machineTasks_[i];
-  }
 }
 
 void Machine::addTask(Task* task) {
   machineTasks_.push_back(task);
-  assignedTasks_++;
 }
 
 void Machine::insertTask(Task* task, int pos) {
@@ -41,7 +29,6 @@ void Machine::insertTask(Task* task, int pos) {
     machineTasks_[i] = machineTasks_[i - 1];
   }
   machineTasks_[pos] = task;
-  assignedTasks_++;
 }
 
 int Machine::assignedTasks() {
@@ -50,15 +37,6 @@ int Machine::assignedTasks() {
 
 std::vector<Task*> Machine::getTaskArray() {
   return machineTasks_;
-}
-
-int Machine::taskArraySize() {
-  return assignedTasks_;
-}
-
-void Machine::unassignTask(int position) {
-  machineTasks_.erase(machineTasks_.begin() + position);
-  assignedTasks_--;
 }
 
 void Machine::reinsertTask(Task* task, int pos) {

@@ -23,8 +23,6 @@
  * 
  */
 class Strategy {
-  private:
-    int z_;
   public:
     Strategy()=default;
     ~Strategy()=default;

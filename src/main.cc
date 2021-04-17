@@ -16,10 +16,8 @@
 #include "../include/GreedyConstructiveAlgorithm.h"
 #include "../include/NewGreedyAlgorithm.h"
 #include "../include/GRASP.h"
-#include "../include/Task.h"
 
 #include <chrono>
-#include <iostream>
 
 int main(int argc, char* argv[]) {
   std::string fileName(argv[1]);
@@ -34,7 +32,7 @@ int main(int argc, char* argv[]) {
   std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
-/*
+
   algorithm = new NewGreedyAlgorithm;
   start = std::chrono::high_resolution_clock::now();
   algorithm->solve(pmsp);
@@ -50,7 +48,7 @@ int main(int argc, char* argv[]) {
   stop = std::chrono::high_resolution_clock::now();
   elapsed = stop - start;
   std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
-  delete algorithm;*/
-
+  delete algorithm;
+  
   return 1;
 }

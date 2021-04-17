@@ -25,41 +25,37 @@
 class Machine {
   private:
     std::vector<Task*> machineTasks_;
-    int assignedTasks_;
 
   public:
-    Machine();
+    Machine()=default;
     Machine(std::vector<Task*>);
-    ~Machine();
+    ~Machine()=default;
     void addTask(Task*);
     void insertTask(Task* task, int pos);
     int assignedTasks();
     std::vector<Task*> getTaskArray();
-    int taskArraySize();
-    void unassignTask(int position);
     /**
-     * @brief Change the position of a task.
+     * @brief Change the position of a task in a machine.
      * 
      * @param task 
      * @param pos 
      */
     void reinsertTask(Task* task, int pos);
     /**
-     * @brief Swap two tasks.
-     * 
-     * @param taskA 
-     * @param taskB 
-     */
-    void swapTask(Task* taskA, Task* taskB);
-    /**
-     * @brief Remove a task from a machine and reinserts it in specified
-     * position of given machine.
+     * @brief Change the machine and the position of a task.
      * 
      * @param task 
      * @param machine 
      * @param pos 
      */
     void intermachineTaskReinsertion(Task* task, Machine* machine, int pos);
+    /**
+     * @brief Swap tasks into the same machine.
+     * 
+     * @param taskA 
+     * @param taskB 
+     */
+    void swapTask(Task* taskA, Task* taskB);
     /**
      * @brief Swap tasks from different machines.
      * 
