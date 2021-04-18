@@ -25,12 +25,26 @@ class GRASP: public Strategy {
     GRASP()=default;
     ~GRASP()=default;
     void solve(PMSProblem& pmsp);
+    std::vector<Machine*> generateSolution(PMSProblem& pmsp);
     std::vector<Task*> selectShorterTasks(PMSProblem& pmsp);
+    std::vector<Machine*> localSearch(std::vector<Machine*> initialSolution, int option);
+
+    std::vector<Machine*> greedyInterReinsertion(std::vector<Machine*> currentSolution);
+    std::vector<Machine*> greedyIntraReinsertion(std::vector<Machine*> currentSolution);
+    std::vector<Machine*> greedyInterSwap(std::vector<Machine*> currentSolution);
+    std::vector<Machine*> greedyIntraSwap(std::vector<Machine*> currentSolution);
+    std::vector<Machine*> anxiousInterReinsertion(std::vector<Machine*> currentSolution);
+    std::vector<Machine*> anxiousIntraReinsertion(std::vector<Machine*> currentSolution);
+    std::vector<Machine*> anxiousInterSwap(std::vector<Machine*> currentSolution);
+    std::vector<Machine*> anxiousIntraSwap(std::vector<Machine*> currentSolution);
+ 
     void assignNextTask(Machine* machine, Task* task);
     bool allTasksAssigned(PMSProblem& pmsp);
     void bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution);
     int calculateBestTCT(Machine* machine, Task* task, int& position);
     int TCT(std::vector<Task*>);
+    int calculateZ(std::vector<Machine*>& solution);
     int C(std::vector<Task*>, int pos);
+    void printSolution(std::vector<Machine*>& solution);
     
 };

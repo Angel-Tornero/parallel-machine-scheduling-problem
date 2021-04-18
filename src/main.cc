@@ -18,7 +18,7 @@
 #include "../include/GRASP.h"
 
 #include <chrono>
-
+#include <unistd.h>
 int main(int argc, char* argv[]) {
   std::string fileName(argv[1]);
   std::string k = argv[2];
@@ -42,12 +42,10 @@ int main(int argc, char* argv[]) {
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
+  std::cout << "\nMultiarranque:\n";
   algorithm = new GRASP;
-  start = std::chrono::high_resolution_clock::now();
   algorithm->solve(pmsp);
-  stop = std::chrono::high_resolution_clock::now();
   elapsed = stop - start;
-  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
   delete algorithm;
   
   return 1;
