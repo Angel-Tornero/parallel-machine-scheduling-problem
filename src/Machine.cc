@@ -39,68 +39,22 @@ std::vector<Task*> Machine::getTaskArray() {
   return machineTasks_;
 }
 
-void Machine::reinsertTask(Task* task, int pos) {
-  bool found = false;
-  for (int i = 0; i < machineTasks_.size(); i++) {
-    if (task == machineTasks_[i]) {
-      machineTasks_.erase(machineTasks_.begin() + i);
-      found = true;
-      break;
-    }
-  }
-  if (found) insertTask(task, pos);
+void Machine::reinsertTask(int taskPos, int newPos) {
+  Task* task = machineTasks_[taskPos];
+  machineTasks_.erase(machineTasks_.begin() + taskPos);
+  insertTask(task, newPos);
 }
 
-void Machine::intermachineTaskReinsertion(Task* task, Machine* machine, int pos) {
-  bool found = false;
-  for (int i = 0; i < machineTasks_.size(); i++) {
-    if (task == machineTasks_[i]) {
-      machineTasks_.erase(machineTasks_.begin() + i);
-      found = true;
-      break;
-    }
-  }
-  if (found) machine->insertTask(task, pos);
+void Machine::intermachineTaskReinsertion(int taskPos, Machine* machine, int newPos) {
+  Task* task = machineTasks_[taskPos];
+  machineTasks_.erase(machineTasks_.begin() + taskPos);
+  machine->insertTask(task, newPos);
 }
 
-void Machine::swapTask(Task* taskA, Task* taskB) {
-  int i, j;
-  bool foundA = false;
-  bool foundB = false;
-  for (i = 0; i < machineTasks_.size(); i++) {
-    if (taskA == machineTasks_[i]) {
-      foundA = true;
-      break;
-    }
-  }
-  for (j = 0; j < machineTasks_.size(); j++) {
-    if (taskB == machineTasks_[j]) {
-      foundB = true;
-      break;
-    }
-  }
-  if (foundA && foundB) {
-    std::swap(machineTasks_[i], machineTasks_[j]);
-  }
+void Machine::swapTask(int taskAPos, int taskBPos) {
+  std::swap(machineTasks_[taskAPos], machineTasks_[taskBPos]);
 }
 
-void Machine::intermachineTaskSwap(Task* taskA, Machine* machineB, Task* taskB) {
-  int i, j;
-  bool foundA = false;
-  bool foundB = false;
-  for (i = 0; i < machineTasks_.size(); i++) {
-    if (taskA == machineTasks_[i]) {
-      foundA = true;
-      break;
-    }
-  }
-  for (j = 0; j < machineB->machineTasks_.size(); j++) {
-    if (taskB == machineB->machineTasks_[j]) {
-      foundB = true;
-      break;
-    }
-  }
-  if (foundA && foundB) {
-    std::swap(machineTasks_[i], machineB->machineTasks_[j]);
-  }
+void Machine::intermachineTaskSwap(int taskAPos, Machine* machineB, int taskBPos) {
+  std::swap(machineTasks_[taskAPos], machineB->machineTasks_[taskBPos]);
 }

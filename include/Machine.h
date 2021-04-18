@@ -40,7 +40,7 @@ class Machine {
      * @param task 
      * @param pos 
      */
-    void reinsertTask(Task* task, int pos);
+    void reinsertTask(int taskPos, int newPos);
     /**
      * @brief Change the machine and the position of a task.
      * 
@@ -48,14 +48,14 @@ class Machine {
      * @param machine 
      * @param pos 
      */
-    void intermachineTaskReinsertion(Task* task, Machine* machine, int pos);
+    void intermachineTaskReinsertion(int taskPos, Machine* machine, int newPos);
     /**
      * @brief Swap tasks into the same machine.
      * 
      * @param taskA 
      * @param taskB 
      */
-    void swapTask(Task* taskA, Task* taskB);
+    void swapTask(int taskAPos, int taskBPos);
     /**
      * @brief Swap tasks from different machines.
      * 
@@ -63,7 +63,7 @@ class Machine {
      * @param machineB 
      * @param taskB 
      */
-    void intermachineTaskSwap(Task* taskA, Machine* machineB, Task* taskB);
+    void intermachineTaskSwap(int taskAPos, Machine* machineB, int taskBPos);
 };
 
 #endif
