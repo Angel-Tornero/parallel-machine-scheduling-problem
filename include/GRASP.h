@@ -20,11 +20,12 @@
  * 
  */
 class GRASP: public Strategy {
-
+  private:
+    int option_;
   public:
-    GRASP()=default;
+    GRASP();
     ~GRASP()=default;
-    void solve(PMSProblem& pmsp);
+    std::vector<Machine*> solve(PMSProblem& pmsp);
     std::vector<Machine*> generateSolution(PMSProblem& pmsp);
     std::vector<Task*> selectShorterTasks(PMSProblem& pmsp);
     std::vector<Machine*> localSearch(std::vector<Machine*> initialSolution, int option);
@@ -47,4 +48,5 @@ class GRASP: public Strategy {
     int C(std::vector<Task*>, int pos);
     void printSolution(std::vector<Machine*>& solution);
     
+    void setOption(int option);
 };

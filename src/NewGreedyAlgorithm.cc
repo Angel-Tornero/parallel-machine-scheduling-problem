@@ -17,7 +17,7 @@
 
 const int BIG_NUMBER = 999999;
 
-void NewGreedyAlgorithm::solve(PMSProblem& pmsp) {
+std::vector<Machine*> NewGreedyAlgorithm::solve(PMSProblem& pmsp) {
   std::vector<Task*> shorterTasks = selectShorterTasks(pmsp);
   std::vector<Machine*> solution;
   for (int i = 0; i < pmsp.getm(); i++) {
@@ -27,22 +27,7 @@ void NewGreedyAlgorithm::solve(PMSProblem& pmsp) {
     bestInsertion(pmsp, solution);
   } while (!allTasksAssigned(pmsp));
 
-  //print
-  int complexTime = 0;
-  std::cout << '\n';
-  std::cout << "Algoritmo Voraz Nuevo: \n";
-  for (int i = 0; i < solution.size(); i++) {
-    std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
-    complexTime += TCT(solution[i]->getTaskArray());
-    for (int j = 0; j < solution[i]->assignedTasks(); j++) {
-      std::cout << solution[i]->getTaskArray()[j]->getId() + 1<< ' ';
-    }
-    std::cout << "}\n";
-  }
-  std::cout << "\tTiempo total: " << complexTime << '\n';
-  for (int i = 0; i < solution.size(); i++) {
-    delete solution[i];
-  }
+  return solution;
 }
 
 void NewGreedyAlgorithm::assignNextTask(Machine* machine, Task* task) {
@@ -113,4 +98,18 @@ int NewGreedyAlgorithm::C(std::vector<Task*> machine, int pos) {
     sum += machine[i]->getSetupTimeTo(machine[i + 1]->getId()) + machine[i + 1]->getProcessTime();
   }
   return sum;
+}
+
+void NewGreedyAlgorithm::printSolution(std::vector<Machine*>& solution) {
+  std::cout << "\nAlgoritmo Greedy Nuevo:\n";
+  int complexTime = 0;
+  for (int i = 0; i < solution.size(); i++) {
+    std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
+    complexTime += TCT(solution[i]->getTaskArray());
+    for (int j = 0; j < solution[i]->assignedTasks(); j++) {
+      std::cout << solution[i]->getTaskArray()[j]->getId() + 1 << ' ';
+    }
+    std::cout << "}\n";
+  }
+  std::cout << "\tTiempo total: " << complexTime << '\n';
 }

@@ -20,32 +20,28 @@
 
 const int BIG_NUMBER = 999999;
 
-void GRASP::solve(PMSProblem& pmsp) {
-  for (int i = 0; i < 8; i++) {
-    std::cout << "\n- Postprocessing method " << i << '\n';
-    auto start = std::chrono::high_resolution_clock::now();
-    std::vector<Machine*> currentSolution = generateSolution(pmsp);
-    std::vector<Machine*> bestSolution = currentSolution;
-    int noImprovementIterations = 0;
-    int bestZ = calculateZ(bestSolution);
-    do {
-      currentSolution = localSearch(currentSolution, i);
-      int newZ = calculateZ(currentSolution);
-      if (newZ < bestZ) {
-        bestSolution = currentSolution;
-        bestZ = newZ;
-        noImprovementIterations = 0;
-      } else {
-        noImprovementIterations++;
-      }
+GRASP::GRASP() {
+  option_ = 0;
+}
+
+std::vector<Machine*> GRASP::solve(PMSProblem& pmsp) {
+  std::vector<Machine*> currentSolution = generateSolution(pmsp);
+  std::vector<Machine*> bestSolution = currentSolution;
+  int noImprovementIterations = 0;
+  int bestZ = calculateZ(bestSolution);
+  do {
+    currentSolution = localSearch(currentSolution, option_);
+    int newZ = calculateZ(currentSolution);
+    if (newZ < bestZ) {
+      bestSolution = currentSolution;
+      bestZ = newZ;
+      noImprovementIterations = 0;
+    } else {
       noImprovementIterations++;
-      currentSolution = generateSolution(pmsp);
-    } while (noImprovementIterations < 1);
-    auto stop = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> elapsed = stop - start;
-    printSolution(bestSolution);
-    std::cout << "Tiempo de ejecución: " << elapsed.count() << " ms\n";
-  }
+    }
+    currentSolution = generateSolution(pmsp);
+  } while (noImprovementIterations < 1);
+  return bestSolution;
 }
 
 std::vector<Machine*> GRASP::generateSolution(PMSProblem& pmsp) {
@@ -412,4 +408,8 @@ void GRASP::printSolution(std::vector<Machine*>& solution) {
     std::cout << "}\n";
   }
   std::cout << "\tTiempo total: " << complexTime << '\n';
+}
+
+void GRASP::setOption(int option) {
+  option_ = option;
 }

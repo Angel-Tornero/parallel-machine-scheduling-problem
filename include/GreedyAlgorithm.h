@@ -8,7 +8,7 @@
   *
   * @author Ángel Tornero Hernández
   * @date 12 Abr 2021
-  * @file GreedyConstructiveAlgorithm.h
+  * @file GreedyAlgorithm.h
   *
   */
 
@@ -20,12 +20,12 @@
  * with Dependent Setup Times
  * 
  */
-class GreedyConstructiveAlgorithm: public Strategy {
+class GreedyAlgorithm: public Strategy {
 
   public:
-    GreedyConstructiveAlgorithm()=default;
-    ~GreedyConstructiveAlgorithm()=default;
-    void solve(PMSProblem& pmsp);
+    GreedyAlgorithm()=default;
+    ~GreedyAlgorithm()=default;
+    std::vector<Machine*> solve(PMSProblem& pmsp);
     std::vector<Task*> selectShorterTasks(PMSProblem& pmsp);
     void assignNextTask(Machine* machine, Task* task);
     bool allTasksAssigned(PMSProblem& pmsp);
@@ -33,5 +33,6 @@ class GreedyConstructiveAlgorithm: public Strategy {
     int calculateBestTCT(Machine* machine, Task* task, int& position);
     int TCT(std::vector<Task*>);
     int C(std::vector<Task*>, int pos);
+    void printSolution(std::vector<Machine*>& solution); 
     
 };

@@ -13,6 +13,7 @@
   */
 
 #include "PMSProblem.h"
+#include "Machine.h"
 
 #ifndef _STRATEGY_
 #define _STRATEGY_
@@ -26,7 +27,8 @@ class Strategy {
   public:
     Strategy()=default;
     ~Strategy()=default;
-    virtual void solve(PMSProblem& pmsp)=0;
+    virtual std::vector<Machine*> solve(PMSProblem& pmsp)=0;
+    virtual void printSolution(std::vector<Machine*>&)=0;
 };
 
 #endif

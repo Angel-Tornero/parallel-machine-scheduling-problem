@@ -8,16 +8,16 @@
   *
   * @author Ángel Tornero Hernández
   * @date 12 Abr 2021
-  * @file GreedyConstructiveAlgorithm.cc
+  * @file GreedyAlgorithm.cc
   *
   */
 
-#include "../include/GreedyConstructiveAlgorithm.h"
+#include "../include/GreedyAlgorithm.h"
 #include <iostream>
 
 const int BIG_NUMBER = 999999;
 
-void GreedyConstructiveAlgorithm::solve(PMSProblem& pmsp) {
+std::vector<Machine*> GreedyAlgorithm::solve(PMSProblem& pmsp) {
   std::vector<Task*> shorterTasks = selectShorterTasks(pmsp);
   std::vector<Machine*> solution;
   for (int i = 0; i < pmsp.getm(); i++) {
@@ -27,29 +27,14 @@ void GreedyConstructiveAlgorithm::solve(PMSProblem& pmsp) {
     bestInsertion(pmsp, solution);
   } while (!allTasksAssigned(pmsp));
 
-  //print
-  int complexTime = 0;
-  std::cout << '\n';
-  std::cout << "Algoritmo Voraz Constructivo: \n";
-  for (int i = 0; i < solution.size(); i++) {
-    std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
-    complexTime += TCT(solution[i]->getTaskArray());
-    for (int j = 0; j < solution[i]->assignedTasks(); j++) {
-      std::cout << solution[i]->getTaskArray()[j]->getId() + 1<< ' ';
-    }
-    std::cout << "}\n";
-  }
-  std::cout << "\tTiempo total: " << complexTime << '\n';
-  for (int i = 0; i < solution.size(); i++) {
-    delete solution[i];
-  }
+  return solution;
 }
 
-void GreedyConstructiveAlgorithm::assignNextTask(Machine* machine, Task* task) {
+void GreedyAlgorithm::assignNextTask(Machine* machine, Task* task) {
   machine->addTask(task);
 }
 
-std::vector<Task*> GreedyConstructiveAlgorithm::selectShorterTasks(PMSProblem& pmsp) {
+std::vector<Task*> GreedyAlgorithm::selectShorterTasks(PMSProblem& pmsp) {
   Task* auxTask = new Task(-1, BIG_NUMBER, BIG_NUMBER);
   Task* shortestTask;
   std::vector<Task*> shorterTasks;
@@ -68,7 +53,7 @@ std::vector<Task*> GreedyConstructiveAlgorithm::selectShorterTasks(PMSProblem& p
   return shorterTasks;
 }
 
-bool GreedyConstructiveAlgorithm::allTasksAssigned(PMSProblem& pmsp) {
+bool GreedyAlgorithm::allTasksAssigned(PMSProblem& pmsp) {
   for (int i = 0; i < pmsp.getn(); i++) {
     if (!pmsp.getTask(i)->assigned()) {
       return false;
@@ -77,7 +62,7 @@ bool GreedyConstructiveAlgorithm::allTasksAssigned(PMSProblem& pmsp) {
   return true;
 }
 
-void GreedyConstructiveAlgorithm::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
+void GreedyAlgorithm::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
   int bestTCT = BIG_NUMBER;
   int bestTask;
   int bestPosition;
@@ -101,7 +86,7 @@ void GreedyConstructiveAlgorithm::bestInsertion(PMSProblem& pmsp, std::vector<Ma
   pmsp.getTask(bestTask)->setAsAssigned();
 }
 
-int GreedyConstructiveAlgorithm::calculateBestTCT(Machine* machine, Task* task, int& position) {
+int GreedyAlgorithm::calculateBestTCT(Machine* machine, Task* task, int& position) {
   int bestTCT = BIG_NUMBER;
   int actualTCT = TCT(machine->getTaskArray());
   for (int i = 0; i < machine->assignedTasks() + 1; i++) {
@@ -116,7 +101,7 @@ int GreedyConstructiveAlgorithm::calculateBestTCT(Machine* machine, Task* task, 
   return bestTCT;
 }
 
-int GreedyConstructiveAlgorithm::TCT(std::vector<Task*> machine) {
+int GreedyAlgorithm::TCT(std::vector<Task*> machine) {
   int sum = 0;
   for (int i = 0; i < machine.size(); i++) {
     sum += C(machine, i);
@@ -124,10 +109,24 @@ int GreedyConstructiveAlgorithm::TCT(std::vector<Task*> machine) {
   return sum;
 }
 
-int GreedyConstructiveAlgorithm::C(std::vector<Task*> machine, int pos) {
+int GreedyAlgorithm::C(std::vector<Task*> machine, int pos) {
   int sum = machine[0]->getSetupTimeZero() + machine[0]->getProcessTime();
   for (int i = 0; i < pos; i++) {
     sum += machine[i]->getSetupTimeTo(machine[i + 1]->getId()) + machine[i + 1]->getProcessTime();
   }
   return sum;
+}
+
+void GreedyAlgorithm::printSolution(std::vector<Machine*>& solution) {
+  std::cout << "\nAlgoritmo Greedy:\n";
+  int complexTime = 0;
+  for (int i = 0; i < solution.size(); i++) {
+    std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
+    complexTime += TCT(solution[i]->getTaskArray());
+    for (int j = 0; j < solution[i]->assignedTasks(); j++) {
+      std::cout << solution[i]->getTaskArray()[j]->getId() + 1 << ' ';
+    }
+    std::cout << "}\n";
+  }
+  std::cout << "\tTiempo total: " << complexTime << '\n';
 }

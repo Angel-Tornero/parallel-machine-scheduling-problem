@@ -25,7 +25,7 @@ class NewGreedyAlgorithm: public Strategy {
   public:
     NewGreedyAlgorithm()=default;
     ~NewGreedyAlgorithm()=default;
-    void solve(PMSProblem& pmsp);
+    std::vector<Machine*> solve(PMSProblem& pmsp);
     std::vector<Task*> selectShorterTasks(PMSProblem& pmsp);
     void assignNextTask(Machine* machine, Task* task);
     bool allTasksAssigned(PMSProblem& pmsp);
@@ -33,5 +33,6 @@ class NewGreedyAlgorithm: public Strategy {
     int calculateBestInsertion(std::vector<Machine*> machines, Task* task, int& machine);
     int TCT(std::vector<Task*>);
     int C(std::vector<Task*>, int pos);
+    void printSolution(std::vector<Machine*>& solution); 
     
 };

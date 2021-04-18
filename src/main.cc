@@ -13,40 +13,62 @@
   */
 
 #include "../include/PMSProblem.h"
-#include "../include/GreedyConstructiveAlgorithm.h"
+#include "../include/GreedyAlgorithm.h"
 #include "../include/NewGreedyAlgorithm.h"
 #include "../include/GRASP.h"
 
 #include <chrono>
-#include <unistd.h>
+
 int main(int argc, char* argv[]) {
   std::string fileName(argv[1]);
   std::string k = argv[2];
   PMSProblem pmsp(fileName, stoi(k));
+  std::vector<Machine*> solution;
 
-  Strategy* algorithm = new GreedyConstructiveAlgorithm;
+  Strategy* algorithm = new GreedyAlgorithm;
   auto start = std::chrono::high_resolution_clock::now();
-  algorithm->solve(pmsp);
+  solution = algorithm->solve(pmsp);
   auto stop = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = stop - start;
-  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
+  std::chrono::duration<double, std::milli> elapsed = stop - start;
+  algorithm->printSolution(solution);
+  
+  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() << " ms\n";
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
   algorithm = new NewGreedyAlgorithm;
   start = std::chrono::high_resolution_clock::now();
-  algorithm->solve(pmsp);
+  solution = algorithm->solve(pmsp);
   stop = std::chrono::high_resolution_clock::now();
   elapsed = stop - start;
-  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() * 1000 << " ms\n";
+  algorithm->printSolution(solution);
+
+  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() << " ms\n";
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
-  std::cout << "\nMultiarranque:\n";
   algorithm = new GRASP;
-  algorithm->solve(pmsp);
+  std::cout << "\n GRASP sin postprocesamiento:\n";
+  start = std::chrono::high_resolution_clock::now();
+  solution = algorithm->solve(pmsp);
+  stop = std::chrono::high_resolution_clock::now();
   elapsed = stop - start;
+  algorithm->printSolution(solution);
+  std::cout << "\tTiempo de ejecución: " << elapsed.count() << " ms\n\n";
+
+  std::cout << "\nMultiarranque:\n";
+  for (int i = 0; i < 8; i++) {
+    std::cout << "- Metodo de postprocesamiento " << i + 1 << '\n';
+    ((GRASP*)algorithm)->setOption(i);
+    start = std::chrono::high_resolution_clock::now();
+    solution = algorithm->solve(pmsp);
+    stop = std::chrono::high_resolution_clock::now();
+    elapsed = stop - start;
+    std::chrono::duration<double, std::milli> elapsed = stop - start;
+    algorithm->printSolution(solution);
+    std::cout << "\tTiempo de ejecución: " << elapsed.count() << " ms\n\n";
+  }
   delete algorithm;
-  
+
   return 1;
 }
