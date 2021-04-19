@@ -21,9 +21,12 @@
  */
 class GRASP: public Strategy {
   private:
-    int option_;
+    int postprocessingOption_;
+    int stopCondition_;
+    int iterationLimit_;
   public:
     GRASP();
+    GRASP(int it);
     ~GRASP()=default;
     std::vector<Machine*> solve(PMSProblem& pmsp);
     std::vector<Machine*> generateSolution(PMSProblem& pmsp);
@@ -48,5 +51,6 @@ class GRASP: public Strategy {
     int C(std::vector<Task*>, int pos);
     void printSolution(std::vector<Machine*>& solution);
     
-    void setOption(int option);
+    void setPostprocessingOption(int option);
+    void setStopCondition(int option);
 };

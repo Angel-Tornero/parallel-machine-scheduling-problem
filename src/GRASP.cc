@@ -21,31 +21,39 @@
 const int BIG_NUMBER = 999999;
 
 GRASP::GRASP() {
-  option_ = 0;
+  postprocessingOption_ = 0;
+  stopCondition_ = 0;
+}
+
+GRASP::GRASP(int it) {
+  postprocessingOption_ = 0;
+  stopCondition_ = 0;
+  iterationLimit_ = it;
 }
 
 std::vector<Machine*> GRASP::solve(PMSProblem& pmsp) {
   std::vector<Machine*> currentSolution = generateSolution(pmsp);
   std::vector<Machine*> bestSolution = currentSolution;
-  int noImprovementIterations = 0;
+  int iterations = 0;
   int bestZ = calculateZ(bestSolution);
   do {
-    currentSolution = localSearch(currentSolution, option_);
+    currentSolution = localSearch(currentSolution, postprocessingOption_);
     int newZ = calculateZ(currentSolution);
     if (newZ < bestZ) {
       bestSolution = currentSolution;
       bestZ = newZ;
-      noImprovementIterations = 0;
+      if (stopCondition_ == 1) iterations = 0;
+      else iterations++;
     } else {
-      noImprovementIterations++;
+      iterations++;
     }
     currentSolution = generateSolution(pmsp);
-  } while (noImprovementIterations < 1);
+  } while (iterations < iterationLimit_);
   return bestSolution;
 }
 
 std::vector<Machine*> GRASP::generateSolution(PMSProblem& pmsp) {
-  srand(time(NULL));
+  
   std::vector<Task*> shorterTasks = selectShorterTasks(pmsp);
   std::vector<Machine*> solution;
   for (int i = 0; i < shorterTasks.size(); i++) {
@@ -329,7 +337,7 @@ void GRASP::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
   std::vector<int> bestPositionsArr;
   std::vector<int> bestMachineArr;
 
-  for (int k = 0; k < pmsp.getk(); k++){
+  for (int k = 0; k < pmsp.getk(); k++) {
     for (int i = 0; i < solution.size(); i++) {
       for (int j = 0; j < pmsp.getn(); j++) {
         if (pmsp.getTask(j)->assigned()) {
@@ -349,6 +357,7 @@ void GRASP::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
     bestPositionsArr.push_back(bestPosition);
     bestMachineArr.push_back(bestMachine);
     pmsp.getTask(bestTask)->setAsAssigned();
+    bestTCT = BIG_NUMBER;
   }
   for (int i = 0; i < bestTasksArr.size(); i++) {
     pmsp.getTask(bestTasksArr[i])->setAsUnassigned();
@@ -410,6 +419,10 @@ void GRASP::printSolution(std::vector<Machine*>& solution) {
   std::cout << "\tTiempo total: " << complexTime << '\n';
 }
 
-void GRASP::setOption(int option) {
-  option_ = option;
+void GRASP::setPostprocessingOption(int option) {
+  postprocessingOption_ = option;
+}
+
+void GRASP::setStopCondition(int option) {
+  stopCondition_ = option;
 }
