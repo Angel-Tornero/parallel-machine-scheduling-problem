@@ -118,16 +118,16 @@ int GreedyAlgorithm::C(std::vector<Task*> machine, int pos) {
 }
 
 void GreedyAlgorithm::printSolution(std::vector<Machine*>& solution) {
-  //std::cout << "\nAlgoritmo Greedy:\n";
+  std::cout << "\n- Algoritmo Greedy:\n";
   int complexTime = 0;
   for (int i = 0; i < solution.size(); i++) {
-    //std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
+    std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
     complexTime += TCT(solution[i]->getTaskArray());
     for (int j = 0; j < solution[i]->assignedTasks(); j++) {
-      //std::cout << solution[i]->getTaskArray()[j]->getId() + 1 << ' ';
+      std::cout << solution[i]->getTaskArray()[j]->getId() + 1 << ' ';
     }
-    //std::cout << "}\n";
+    std::cout << "}\n";
   }
-  //std::cout << "\tTiempo total: " << complexTime << '\n';
+  std::cout << "\tTiempo total: " << complexTime << '\n';
   std::cout << complexTime;
 }

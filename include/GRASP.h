@@ -22,13 +22,12 @@
 class GRASP: public Strategy {
   private:
     int postprocessingOption_;
-    int stopCondition_;
-    int iterationLimit_;
   public:
     GRASP();
-    GRASP(int it);
     ~GRASP()=default;
     std::vector<Machine*> solve(PMSProblem& pmsp);
+    std::vector<Machine*> solveFixedIterations(PMSProblem& pmsp);
+    std::vector<Machine*> solveNonFixedIterations(PMSProblem& pmsp);
     std::vector<Machine*> generateSolution(PMSProblem& pmsp);
     std::vector<Task*> selectShorterTasks(PMSProblem& pmsp);
     std::vector<Machine*> localSearch(std::vector<Machine*> initialSolution, int option);

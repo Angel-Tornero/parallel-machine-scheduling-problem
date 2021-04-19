@@ -22,16 +22,13 @@ const int BIG_NUMBER = 999999;
 
 GRASP::GRASP() {
   postprocessingOption_ = 0;
-  stopCondition_ = 0;
-}
-
-GRASP::GRASP(int it) {
-  postprocessingOption_ = 0;
-  stopCondition_ = 0;
-  iterationLimit_ = it;
 }
 
 std::vector<Machine*> GRASP::solve(PMSProblem& pmsp) {
+  return generateSolution(pmsp);
+}
+
+std::vector<Machine*> GRASP::solveNonFixedIterations(PMSProblem& pmsp) {
   std::vector<Machine*> currentSolution = generateSolution(pmsp);
   std::vector<Machine*> bestSolution = currentSolution;
   int iterations = 0;
@@ -42,13 +39,30 @@ std::vector<Machine*> GRASP::solve(PMSProblem& pmsp) {
     if (newZ < bestZ) {
       bestSolution = currentSolution;
       bestZ = newZ;
-      if (stopCondition_ == 1) iterations = 0;
-      else iterations++;
+      iterations = 0;
     } else {
       iterations++;
     }
     currentSolution = generateSolution(pmsp);
-  } while (iterations < iterationLimit_);
+  } while (iterations < 10);
+  return bestSolution;
+}
+
+std::vector<Machine*> GRASP::solveFixedIterations(PMSProblem& pmsp) {
+  std::vector<Machine*> currentSolution = generateSolution(pmsp);
+  std::vector<Machine*> bestSolution = currentSolution;
+  int iterations = 0;
+  int bestZ = calculateZ(bestSolution);
+  do {
+    currentSolution = localSearch(currentSolution, postprocessingOption_);
+    int newZ = calculateZ(currentSolution);
+    if (newZ < bestZ) {
+      bestSolution = currentSolution;
+      bestZ = newZ;
+    }
+    iterations++;
+    currentSolution = generateSolution(pmsp);
+  } while (iterations < 10);
   return bestSolution;
 }
 
@@ -333,6 +347,7 @@ void GRASP::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
   int bestTask;
   int bestPosition;
   int bestMachine;
+  int lastBestTCT = 0;
   std::vector<int> bestTasksArr;
   std::vector<int> bestPositionsArr;
   std::vector<int> bestMachineArr;
@@ -353,11 +368,14 @@ void GRASP::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
         }
       }
     }
-    bestTasksArr.push_back(bestTask);
-    bestPositionsArr.push_back(bestPosition);
-    bestMachineArr.push_back(bestMachine);
-    pmsp.getTask(bestTask)->setAsAssigned();
-    bestTCT = BIG_NUMBER;
+    if (lastBestTCT != bestTCT) {
+      bestTasksArr.push_back(bestTask);
+      bestPositionsArr.push_back(bestPosition);
+      bestMachineArr.push_back(bestMachine);
+      pmsp.getTask(bestTask)->setAsAssigned();
+      bestTCT = BIG_NUMBER;
+      lastBestTCT = bestTCT;
+    }
   }
   for (int i = 0; i < bestTasksArr.size(); i++) {
     pmsp.getTask(bestTasksArr[i])->setAsUnassigned();
@@ -421,8 +439,4 @@ void GRASP::printSolution(std::vector<Machine*>& solution) {
 
 void GRASP::setPostprocessingOption(int option) {
   postprocessingOption_ = option;
-}
-
-void GRASP::setStopCondition(int option) {
-  stopCondition_ = option;
 }
