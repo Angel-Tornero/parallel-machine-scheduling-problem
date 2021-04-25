@@ -440,3 +440,143 @@ void GRASP::printSolution(std::vector<Machine*>& solution) {
 void GRASP::setPostprocessingOption(int option) {
   postprocessingOption_ = option;
 }
+
+std::vector<Machine*> GRASP::solveGVNSFixedIterations(PMSProblem& pmsp) {
+  srand(time(NULL));
+  int iterations = 0;
+  std::vector<Machine*> currentSolution = generateSolution(pmsp);
+  currentSolution = localSearch(currentSolution, 0);
+  std::cout << "-Inicial:\n";
+  printSolution(currentSolution);
+  std::vector<int> kStructures = {0, 2};
+  std::vector<int> lStructures = {3, 1, 2, 0};
+  int currentK;
+  do {
+    currentK = kStructures[0];
+    do {
+      std::vector<Machine*> shakingSolution = generateRandomPoint(currentSolution, kStructures[currentK]);
+      std::vector<Machine*> bestLocal = localSearchVND(shakingSolution, lStructures);
+      if (calculateZ(bestLocal) < calculateZ(currentSolution)) {
+        currentSolution = bestLocal;
+        currentK = 0;
+      } else {
+        currentK++;
+      }
+    } while (currentK < kStructures.size());
+    iterations++;
+  } while (iterations < 20);
+  return currentSolution;
+}
+
+std::vector<Machine*> GRASP::solveGVNSNonFixedIterations(PMSProblem& pmsp) {
+  srand(time(NULL));
+  int iterations = 0;
+  std::vector<Machine*> currentSolution = generateSolution(pmsp);
+  currentSolution = localSearch(currentSolution, 0);
+  std::cout << "- Inicial:\n";
+  printSolution(currentSolution);
+  std::vector<int> kStructures = {0};
+  std::vector<int> lStructures = {3, 1, 2, 0};
+  int currentK;
+  do {
+    currentK = kStructures[0];
+    do {
+      std::vector<Machine*> shakingSolution = generateRandomPoint(currentSolution, kStructures[currentK]);
+      std::vector<Machine*> bestLocal = localSearchVND(shakingSolution, lStructures);
+      if (calculateZ(bestLocal) < calculateZ(currentSolution)) {
+        currentSolution = bestLocal;
+        currentK = 0;
+        iterations = -1;
+      } else {
+        currentK++;
+      }
+    } while (currentK < kStructures.size());
+    iterations++;
+  } while (iterations < 20);
+  return currentSolution;
+}
+
+std::vector<Machine*> GRASP::generateRandomPoint(std::vector<Machine*> solution, int structure) {
+  std::vector<Machine*> neighbouringSolution;
+  int randomA;
+  int randomB;
+  for (int l = 0; l < solution.size(); l++) {
+    neighbouringSolution.push_back(new Machine(solution[l]->getTaskArray()));
+  }
+  switch (structure) {
+    case 0:
+      randomA = rand() % neighbouringSolution.size();
+      randomB = rand() % neighbouringSolution.size();
+      if (randomB == randomA) {
+        if (randomB == neighbouringSolution.size() - 1) {
+          randomB = neighbouringSolution.size() - 2;
+        }
+        else {
+          randomB++;
+        }
+      }
+      neighbouringSolution[randomA]->intermachineTaskReinsertion(rand() % neighbouringSolution[randomA]->assignedTasks(), neighbouringSolution[randomB], rand() % (neighbouringSolution[randomB]->assignedTasks()));
+      break;
+    case 2:
+      randomA = rand() % neighbouringSolution.size();
+      randomB = rand() % neighbouringSolution.size();
+      if (randomB == randomA) {
+        if (randomB == neighbouringSolution.size() - 1) randomB = neighbouringSolution.size() - 2;
+        else {
+          randomB++;
+        }
+      }
+      
+      neighbouringSolution[randomA]->intermachineTaskSwap(rand() % neighbouringSolution[randomA]->assignedTasks(), neighbouringSolution[randomB], rand() % neighbouringSolution[randomB]->assignedTasks());
+      break;
+  }
+  return neighbouringSolution;
+}
+
+std::vector<Machine*> GRASP::localSearchVND(std::vector<Machine*> initialSolution, std::vector<int> lStructures) {
+  std::vector<Machine*> currentSolution = initialSolution;
+  std::vector<Machine*> bestSolution = currentSolution;
+  int bestZ = calculateZ(bestSolution);
+  int l = 0;
+  do {
+    std::vector<Machine*> bestNeighbour;
+    switch (lStructures[l]) {
+      case 0:
+        bestNeighbour = greedyInterReinsertion(currentSolution);
+        break;
+      case 1:
+        bestNeighbour = greedyIntraReinsertion(currentSolution);
+        break;
+      case 2:
+        bestNeighbour = greedyInterSwap(currentSolution);
+        break;
+      case 3:
+        bestNeighbour = greedyIntraSwap(currentSolution);
+        break;
+      case 4:
+        bestNeighbour = anxiousInterReinsertion(currentSolution);
+        break;
+      case 5:
+        bestNeighbour = anxiousIntraReinsertion(currentSolution);
+        break;
+      case 6:
+        bestNeighbour = anxiousInterSwap(currentSolution);
+        break;
+      case 7:
+        bestNeighbour = anxiousIntraSwap(currentSolution);
+        break;
+    }
+    int newZ = calculateZ(bestNeighbour);
+    if (newZ < bestZ) {
+      currentSolution = bestNeighbour;
+      bestSolution = currentSolution;
+      bestZ = newZ;
+      l = 0;
+      continue;
+    }
+    if (l == lStructures.size() - 1) break;
+    l++;
+    
+  } while (true);
+  return bestSolution;
+}

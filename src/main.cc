@@ -94,7 +94,20 @@ int main(int argc, char* argv[]) {
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
-  algorithm = new NewGreedyAlgorithm;
+  algorithm = new GRASP;
+  std::cout << "- GVNS:\n"; 
+  start = std::chrono::high_resolution_clock::now();
+  solution = ((GRASP*)algorithm)->solveGVNSNonFixedIterations(pmsp);
+  stop = std::chrono::high_resolution_clock::now();
+  elapsed = stop - start;
+  std::cout << "\n- Mejorado:\n";
+  algorithm->printSolution(solution);
+
+  std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() << " ms\n";
+  delete algorithm;
+  pmsp.setAllTasksAsUnassigned();
+
+  /*algorithm = new NewGreedyAlgorithm;
   start = std::chrono::high_resolution_clock::now();
   solution = algorithm->solve(pmsp);
   stop = std::chrono::high_resolution_clock::now();
@@ -136,8 +149,7 @@ int main(int argc, char* argv[]) {
     elapsed = stop - start;
     algorithm->printSolution(solution);
     std::cout << "\tTiempo de ejecución: " << elapsed.count() << " ms\n\n";
-  }
-  delete algorithm;
+  }*/
 
   return 1;
 }

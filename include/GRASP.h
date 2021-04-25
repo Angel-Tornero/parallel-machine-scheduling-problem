@@ -52,4 +52,9 @@ class GRASP: public Strategy {
     
     void setPostprocessingOption(int option);
     void setStopCondition(int option);
+
+    std::vector<Machine*> solveGVNSFixedIterations(PMSProblem& pmsp);
+    std::vector<Machine*> solveGVNSNonFixedIterations(PMSProblem& pmsp);
+    std::vector<Machine*> generateRandomPoint(std::vector<Machine*> solution, int structure);
+    std::vector<Machine*> localSearchVND(std::vector<Machine*> solution, std::vector<int> lStructures);
 };

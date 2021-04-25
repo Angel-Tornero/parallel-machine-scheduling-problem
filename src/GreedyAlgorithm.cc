@@ -129,5 +129,4 @@ void GreedyAlgorithm::printSolution(std::vector<Machine*>& solution) {
     std::cout << "}\n";
   }
   std::cout << "\tTiempo total: " << complexTime << '\n';
-  std::cout << complexTime;
 }
