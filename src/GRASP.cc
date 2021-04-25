@@ -112,14 +112,14 @@ std::vector<Machine*> GRASP::localSearch(std::vector<Machine*> initialSolution, 
         bestNeighbour = anxiousIntraSwap(currentSolution);
         break;
     }
-    if (bestNeighbour == currentSolution) {
-      break;
-    }
-    currentSolution = bestNeighbour;
-    int newZ = calculateZ(currentSolution);
+
+    int newZ = calculateZ(bestNeighbour);
     if (newZ < bestZ) {
+      currentSolution = bestNeighbour;
       bestSolution = currentSolution;
       bestZ = newZ;
+    } else {
+      break;
     }
   } while (true);
   return bestSolution;
@@ -492,7 +492,7 @@ std::vector<Machine*> GRASP::solveGVNSNonFixedIterations(PMSProblem& pmsp) {
       }
     } while (currentK < kStructures.size());
     iterations++;
-  } while (iterations < 20);
+  } while (iterations < 100);
   return currentSolution;
 }
 
