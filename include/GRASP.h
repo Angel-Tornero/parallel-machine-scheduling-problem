@@ -20,8 +20,10 @@
  * 
  */
 class GRASP: public Strategy {
+  
   private:
     int postprocessingOption_;
+
   public:
     /**
      * @brief Construct a new GRASP object.
