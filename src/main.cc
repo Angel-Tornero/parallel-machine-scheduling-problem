@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
   std::cout << "\tTiempo de ejecución del algoritmo: " << elapsed.count() << " ms\n";
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
-
+/*
   algorithm = new NewGreedyAlgorithm;
   start = std::chrono::high_resolution_clock::now();
   solution = algorithm->solve(pmsp);
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
     elapsed = stop - start;
     algorithm->printSolution(solution);
     std::cout << "\tTiempo de ejecución: " << elapsed.count() << " ms\n\n";
-  }
+  }*/
 
   return 1;
 }

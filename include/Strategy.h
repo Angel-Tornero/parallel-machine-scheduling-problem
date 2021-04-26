@@ -20,14 +20,35 @@
 
 /**
  * @class Strategy base class for Parallel Machine Scheduling Problem
- * with Dependent Setup Times
+ * with Dependent Setup Times.
  * 
  */
 class Strategy {
   public:
+    /**
+     * @brief Construct a new Strategy object.
+     * 
+     */
     Strategy()=default;
+
+    /**
+     * @brief Destroy the Strategy object.
+     * 
+     */
     ~Strategy()=default;
+
+    /**
+     * @brief Solves the given problem and returns the solution.
+     * 
+     * @param pmsp 
+     * @return std::vector<Machine*> 
+     */
     virtual std::vector<Machine*> solve(PMSProblem& pmsp)=0;
+
+    /**
+     * @brief Prints on terminal the solution.
+     * 
+     */
     virtual void printSolution(std::vector<Machine*>&)=0;
 };
 

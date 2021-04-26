@@ -27,7 +27,7 @@ std::vector<Machine*> GVNS::solveFixedIterations(PMSProblem& pmsp) {
   currentSolution = localSearch(currentSolution, 0);
   std::cout << "-Inicial:\n";
   printSolution(currentSolution);
-  std::vector<int> kStructures = {0};
+  std::vector<int> kStructures = {0, 0, 0, 0, 0};
   std::vector<int> lStructures = {3, 1, 2, 0};
   int currentK;
   do {
@@ -43,7 +43,7 @@ std::vector<Machine*> GVNS::solveFixedIterations(PMSProblem& pmsp) {
       }
     } while (currentK < kStructures.size());
     iterations++;
-  } while (iterations < 1);
+  } while (iterations < 100);
   return currentSolution;
 }
 
@@ -54,7 +54,7 @@ std::vector<Machine*> GVNS::solveNonFixedIterations(PMSProblem& pmsp) {
   currentSolution = localSearch(currentSolution, 0);
   std::cout << "- Inicial:\n";
   printSolution(currentSolution);
-  std::vector<int> kStructures = {0};
+  std::vector<int> kStructures = {0, 0, 0, 0, 0};
   std::vector<int> lStructures = {3, 1, 2, 0};
   int currentK;
   do {
@@ -114,8 +114,7 @@ std::vector<Machine*> GVNS::generateRandomPoint(std::vector<Machine*> solution, 
 
 std::vector<Machine*> GVNS::localSearchVND(std::vector<Machine*> initialSolution, std::vector<int> lStructures) {
   std::vector<Machine*> currentSolution = initialSolution;
-  std::vector<Machine*> bestSolution = currentSolution;
-  int bestZ = calculateZ(bestSolution);
+  int bestZ = calculateZ(currentSolution);
   int l = 0;
   do {
     std::vector<Machine*> bestNeighbour;
@@ -148,7 +147,6 @@ std::vector<Machine*> GVNS::localSearchVND(std::vector<Machine*> initialSolution
     int newZ = calculateZ(bestNeighbour);
     if (newZ < bestZ) {
       currentSolution = bestNeighbour;
-      bestSolution = currentSolution;
       bestZ = newZ;
       l = 0;
       continue;
@@ -157,7 +155,7 @@ std::vector<Machine*> GVNS::localSearchVND(std::vector<Machine*> initialSolution
     l++;
     
   } while (true);
-  return bestSolution;
+  return currentSolution;
 }
 
 std::vector<Machine*> GVNS::generateSolution(PMSProblem& pmsp) {

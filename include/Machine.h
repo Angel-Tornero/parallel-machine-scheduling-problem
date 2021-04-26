@@ -27,13 +27,40 @@ class Machine {
     std::vector<Task*> machineTasks_;
 
   public:
+    /**
+     * @brief Construct a new Machine object.
+     * 
+     */
     Machine()=default;
+
+    /**
+     * @brief Construct a new Machine object.
+     * 
+     */
     Machine(std::vector<Task*>);
+
+    /**
+     * @brief Destroy the Machine object
+     * 
+     */
     ~Machine()=default;
+
+    /**
+     * @brief Adds a task to the machine.
+     * 
+     */
     void addTask(Task*);
+
+    /**
+     * @brief Insert a task in given position.
+     * 
+     * @param task 
+     * @param pos 
+     */
     void insertTask(Task* task, int pos);
     int assignedTasks();
     std::vector<Task*> getTaskArray();
+
     /**
      * @brief Change the position of a task in a machine.
      * 
@@ -41,6 +68,7 @@ class Machine {
      * @param pos 
      */
     void reinsertTask(int taskPos, int newPos);
+
     /**
      * @brief Change the machine and the position of a task.
      * 
@@ -49,6 +77,7 @@ class Machine {
      * @param pos 
      */
     void intermachineTaskReinsertion(int taskPos, Machine* machine, int newPos);
+
     /**
      * @brief Swap tasks into the same machine.
      * 
@@ -56,6 +85,7 @@ class Machine {
      * @param taskB 
      */
     void swapTask(int taskAPos, int taskBPos);
+
     /**
      * @brief Swap tasks from different machines.
      * 
