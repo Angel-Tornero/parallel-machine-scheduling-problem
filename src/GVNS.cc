@@ -25,8 +25,6 @@ std::vector<Machine*> GVNS::solveFixedIterations(PMSProblem& pmsp) {
   int iterations = 0;
   std::vector<Machine*> currentSolution = generateSolution(pmsp);
   currentSolution = localSearch(currentSolution, 0);
-  std::cout << "-Inicial:\n";
-  printSolution(currentSolution);
   std::vector<int> kStructures = {0, 0, 0, 0, 0};
   std::vector<int> lStructures = {3, 1, 2, 0};
   int currentK;
@@ -43,7 +41,7 @@ std::vector<Machine*> GVNS::solveFixedIterations(PMSProblem& pmsp) {
       }
     } while (currentK < kStructures.size());
     iterations++;
-  } while (iterations < 100);
+  } while (iterations < 50);
   return currentSolution;
 }
 
@@ -52,8 +50,6 @@ std::vector<Machine*> GVNS::solveNonFixedIterations(PMSProblem& pmsp) {
   int iterations = 0;
   std::vector<Machine*> currentSolution = generateSolution(pmsp);
   currentSolution = localSearch(currentSolution, 0);
-  std::cout << "- Inicial:\n";
-  printSolution(currentSolution);
   std::vector<int> kStructures = {0, 0, 0, 0, 0};
   std::vector<int> lStructures = {3, 1, 2, 0};
   int currentK;
@@ -516,6 +512,7 @@ int GVNS::calculateZ(std::vector<Machine*>& solution) {
 
 void GVNS::printSolution(std::vector<Machine*>& solution) {
   int complexTime = 0;
+  std::cout << '\n';
   for (int i = 0; i < solution.size(); i++) {
     std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
     complexTime += TCT(solution[i]->getTaskArray());
