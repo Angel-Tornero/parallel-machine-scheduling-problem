@@ -8,65 +8,159 @@
   *
   * @author Ángel Tornero Hernández
   * @date 13 Abr 2021
-  * @file GRASP.cc
+  * @file GVNS.cc
   *
   */
 
-#include "../include/GRASP.h"
-#include <iostream>
-#include <stdlib.h>
-#include <time.h>
-#include <chrono>
+#include "../include/GVNS.h"
 
 const int BIG_NUMBER = 999999;
 
-GRASP::GRASP() {
-  postprocessingOption_ = 0;
+std::vector<Machine*> GVNS::solve(PMSProblem& pmsp) {
+  return solveFixedIterations(pmsp);
 }
 
-std::vector<Machine*> GRASP::solve(PMSProblem& pmsp) {
-  return generateSolution(pmsp);
-}
-
-std::vector<Machine*> GRASP::solveNonFixedIterations(PMSProblem& pmsp) {
-  std::vector<Machine*> currentSolution = generateSolution(pmsp);
-  std::vector<Machine*> bestSolution = currentSolution;
+std::vector<Machine*> GVNS::solveFixedIterations(PMSProblem& pmsp) {
+  srand(time(NULL));
   int iterations = 0;
-  int bestZ = calculateZ(bestSolution);
-  do {
-    currentSolution = localSearch(currentSolution, postprocessingOption_);
-    int newZ = calculateZ(currentSolution);
-    if (newZ < bestZ) {
-      bestSolution = currentSolution;
-      bestZ = newZ;
-      iterations = 0;
-    } else {
-      iterations++;
-    }
-    currentSolution = generateSolution(pmsp);
-  } while (iterations < 10);
-  return bestSolution;
-}
-
-std::vector<Machine*> GRASP::solveFixedIterations(PMSProblem& pmsp) {
   std::vector<Machine*> currentSolution = generateSolution(pmsp);
-  std::vector<Machine*> bestSolution = currentSolution;
-  int iterations = 0;
-  int bestZ = calculateZ(bestSolution);
+  currentSolution = localSearch(currentSolution, 0);
+  std::cout << "-Inicial:\n";
+  printSolution(currentSolution);
+  std::vector<int> kStructures = {0};
+  std::vector<int> lStructures = {3, 1, 2, 0};
+  int currentK;
   do {
-    currentSolution = localSearch(currentSolution, postprocessingOption_);
-    int newZ = calculateZ(currentSolution);
-    if (newZ < bestZ) {
-      bestSolution = currentSolution;
-      bestZ = newZ;
-    }
+    currentK = kStructures[0];
+    do {
+      std::vector<Machine*> shakingSolution = generateRandomPoint(currentSolution, kStructures[currentK]);
+      std::vector<Machine*> bestLocal = localSearchVND(shakingSolution, lStructures);
+      if (calculateZ(bestLocal) < calculateZ(currentSolution)) {
+        currentSolution = bestLocal;
+        currentK = 0;
+      } else {
+        currentK++;
+      }
+    } while (currentK < kStructures.size());
     iterations++;
-    currentSolution = generateSolution(pmsp);
-  } while (iterations < 10);
+  } while (iterations < 1);
+  return currentSolution;
+}
+
+std::vector<Machine*> GVNS::solveNonFixedIterations(PMSProblem& pmsp) {
+  srand(time(NULL));
+  int iterations = 0;
+  std::vector<Machine*> currentSolution = generateSolution(pmsp);
+  currentSolution = localSearch(currentSolution, 0);
+  std::cout << "- Inicial:\n";
+  printSolution(currentSolution);
+  std::vector<int> kStructures = {0};
+  std::vector<int> lStructures = {3, 1, 2, 0};
+  int currentK;
+  do {
+    currentK = kStructures[0];
+    do {
+      std::vector<Machine*> shakingSolution = generateRandomPoint(currentSolution, kStructures[currentK]);
+      std::vector<Machine*> bestLocal = localSearchVND(shakingSolution, lStructures);
+      if (calculateZ(bestLocal) < calculateZ(currentSolution)) {
+        currentSolution = bestLocal;
+        currentK = 0;
+        iterations = -1;
+      } else {
+        currentK++;
+      }
+    } while (currentK < kStructures.size());
+    iterations++;
+  } while (iterations < 100);
+  return currentSolution;
+}
+
+std::vector<Machine*> GVNS::generateRandomPoint(std::vector<Machine*> solution, int structure) {
+  std::vector<Machine*> neighbouringSolution;
+  int randomA;
+  int randomB;
+  for (int l = 0; l < solution.size(); l++) {
+    neighbouringSolution.push_back(new Machine(solution[l]->getTaskArray()));
+  }
+  switch (structure) {
+    case 0:
+      randomA = rand() % neighbouringSolution.size();
+      randomB = rand() % neighbouringSolution.size();
+      if (randomB == randomA) {
+        if (randomB == neighbouringSolution.size() - 1) {
+          randomB = neighbouringSolution.size() - 2;
+        }
+        else {
+          randomB++;
+        }
+      }
+      neighbouringSolution[randomA]->intermachineTaskReinsertion(rand() % neighbouringSolution[randomA]->assignedTasks(), neighbouringSolution[randomB], rand() % (neighbouringSolution[randomB]->assignedTasks()));
+      break;
+    case 2:
+      randomA = rand() % neighbouringSolution.size();
+      randomB = rand() % neighbouringSolution.size();
+      if (randomB == randomA) {
+        if (randomB == neighbouringSolution.size() - 1) randomB = neighbouringSolution.size() - 2;
+        else {
+          randomB++;
+        }
+      }
+      
+      neighbouringSolution[randomA]->intermachineTaskSwap(rand() % neighbouringSolution[randomA]->assignedTasks(), neighbouringSolution[randomB], rand() % neighbouringSolution[randomB]->assignedTasks());
+      break;
+  }
+  return neighbouringSolution;
+}
+
+std::vector<Machine*> GVNS::localSearchVND(std::vector<Machine*> initialSolution, std::vector<int> lStructures) {
+  std::vector<Machine*> currentSolution = initialSolution;
+  std::vector<Machine*> bestSolution = currentSolution;
+  int bestZ = calculateZ(bestSolution);
+  int l = 0;
+  do {
+    std::vector<Machine*> bestNeighbour;
+    switch (lStructures[l]) {
+      case 0:
+        bestNeighbour = greedyInterReinsertion(currentSolution);
+        break;
+      case 1:
+        bestNeighbour = greedyIntraReinsertion(currentSolution);
+        break;
+      case 2:
+        bestNeighbour = greedyInterSwap(currentSolution);
+        break;
+      case 3:
+        bestNeighbour = greedyIntraSwap(currentSolution);
+        break;
+      case 4:
+        bestNeighbour = anxiousInterReinsertion(currentSolution);
+        break;
+      case 5:
+        bestNeighbour = anxiousIntraReinsertion(currentSolution);
+        break;
+      case 6:
+        bestNeighbour = anxiousInterSwap(currentSolution);
+        break;
+      case 7:
+        bestNeighbour = anxiousIntraSwap(currentSolution);
+        break;
+    }
+    int newZ = calculateZ(bestNeighbour);
+    if (newZ < bestZ) {
+      currentSolution = bestNeighbour;
+      bestSolution = currentSolution;
+      bestZ = newZ;
+      l = 0;
+      continue;
+    }
+    if (l == lStructures.size() - 1) break;
+    l++;
+    
+  } while (true);
   return bestSolution;
 }
 
-std::vector<Machine*> GRASP::generateSolution(PMSProblem& pmsp) {
+std::vector<Machine*> GVNS::generateSolution(PMSProblem& pmsp) {
   
   std::vector<Task*> shorterTasks = selectShorterTasks(pmsp);
   std::vector<Machine*> solution;
@@ -80,7 +174,7 @@ std::vector<Machine*> GRASP::generateSolution(PMSProblem& pmsp) {
   return solution;
 }
 
-std::vector<Machine*> GRASP::localSearch(std::vector<Machine*> initialSolution, int option) {
+std::vector<Machine*> GVNS::localSearch(std::vector<Machine*> initialSolution, int option) {
   std::vector<Machine*> currentSolution = initialSolution;
   int bestZ = calculateZ(currentSolution);
   do {
@@ -125,7 +219,7 @@ std::vector<Machine*> GRASP::localSearch(std::vector<Machine*> initialSolution, 
 
 // greedy
 
-std::vector<Machine*> GRASP::greedyIntraReinsertion(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::greedyIntraReinsertion(std::vector<Machine*> currentSolution) {
   std::vector<Machine*> bestSolution = currentSolution;
   int bestZ = calculateZ(bestSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
@@ -148,7 +242,7 @@ std::vector<Machine*> GRASP::greedyIntraReinsertion(std::vector<Machine*> curren
   return bestSolution;
 }
 
-std::vector<Machine*> GRASP::greedyInterReinsertion(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::greedyInterReinsertion(std::vector<Machine*> currentSolution) {
   std::vector<Machine*> bestSolution = currentSolution;
   int bestZ = calculateZ(bestSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
@@ -173,7 +267,7 @@ std::vector<Machine*> GRASP::greedyInterReinsertion(std::vector<Machine*> curren
   return bestSolution;
 }
 
-std::vector<Machine*> GRASP::greedyIntraSwap(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::greedyIntraSwap(std::vector<Machine*> currentSolution) {
   std::vector<Machine*> bestSolution = currentSolution;
   int bestZ = calculateZ(bestSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
@@ -196,7 +290,7 @@ std::vector<Machine*> GRASP::greedyIntraSwap(std::vector<Machine*> currentSoluti
   return bestSolution;
 }
 
-std::vector<Machine*> GRASP::greedyInterSwap(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::greedyInterSwap(std::vector<Machine*> currentSolution) {
   std::vector<Machine*> bestSolution = currentSolution;
   int bestZ = calculateZ(bestSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
@@ -223,7 +317,7 @@ std::vector<Machine*> GRASP::greedyInterSwap(std::vector<Machine*> currentSoluti
 
 // anxious
 
-std::vector<Machine*> GRASP::anxiousInterReinsertion(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::anxiousInterReinsertion(std::vector<Machine*> currentSolution) {
   int bestZ = calculateZ(currentSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
     for (int j = 0; j < currentSolution.size(); j++) {
@@ -246,7 +340,7 @@ std::vector<Machine*> GRASP::anxiousInterReinsertion(std::vector<Machine*> curre
   return currentSolution;
 }
 
-std::vector<Machine*> GRASP::anxiousIntraReinsertion(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::anxiousIntraReinsertion(std::vector<Machine*> currentSolution) {
   int bestZ = calculateZ(currentSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
     for (int j = 0; j < currentSolution[i]->assignedTasks(); j++) {
@@ -266,7 +360,7 @@ std::vector<Machine*> GRASP::anxiousIntraReinsertion(std::vector<Machine*> curre
   return currentSolution;
 }
 
-std::vector<Machine*> GRASP::anxiousInterSwap(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::anxiousInterSwap(std::vector<Machine*> currentSolution) {
   int bestZ = calculateZ(currentSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
     for (int j = 0; j < currentSolution.size(); j++) {
@@ -288,7 +382,7 @@ std::vector<Machine*> GRASP::anxiousInterSwap(std::vector<Machine*> currentSolut
   return currentSolution;
 }
 
-std::vector<Machine*> GRASP::anxiousIntraSwap(std::vector<Machine*> currentSolution) {
+std::vector<Machine*> GVNS::anxiousIntraSwap(std::vector<Machine*> currentSolution) {
   int bestZ = calculateZ(currentSolution);
   for (int i = 0; i < currentSolution.size(); i++) {
     for (int j = 0; j < currentSolution[i]->assignedTasks(); j++) {
@@ -308,11 +402,11 @@ std::vector<Machine*> GRASP::anxiousIntraSwap(std::vector<Machine*> currentSolut
   return currentSolution;
 }
 
-void GRASP::assignNextTask(Machine* machine, Task* task) {
+void GVNS::assignNextTask(Machine* machine, Task* task) {
   machine->addTask(task);
 }
 
-std::vector<Task*> GRASP::selectShorterTasks(PMSProblem& pmsp) {
+std::vector<Task*> GVNS::selectShorterTasks(PMSProblem& pmsp) {
   Task* auxTask = new Task(-1, BIG_NUMBER, BIG_NUMBER);
   Task* shortestTask;
   std::vector<Task*> shorterTasks;
@@ -331,7 +425,7 @@ std::vector<Task*> GRASP::selectShorterTasks(PMSProblem& pmsp) {
   return shorterTasks;
 }
 
-bool GRASP::allTasksAssigned(PMSProblem& pmsp) {
+bool GVNS::allTasksAssigned(PMSProblem& pmsp) {
   for (int i = 0; i < pmsp.getn(); i++) {
     if (!pmsp.getTask(i)->assigned()) {
       return false;
@@ -340,7 +434,7 @@ bool GRASP::allTasksAssigned(PMSProblem& pmsp) {
   return true;
 }
 
-void GRASP::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
+void GVNS::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
   int bestTCT = BIG_NUMBER;
   int bestTask;
   int bestPosition;
@@ -383,7 +477,7 @@ void GRASP::bestInsertion(PMSProblem& pmsp, std::vector<Machine*>& solution) {
   pmsp.getTask(bestTasksArr[randomNumber])->setAsAssigned();
 }
 
-int GRASP::calculateBestTCT(Machine* machine, Task* task, int& position) {
+int GVNS::calculateBestTCT(Machine* machine, Task* task, int& position) {
   int bestTCT = BIG_NUMBER;
   int actualTCT = TCT(machine->getTaskArray());
   for (int i = 0; i < machine->assignedTasks() + 1; i++) {
@@ -398,7 +492,7 @@ int GRASP::calculateBestTCT(Machine* machine, Task* task, int& position) {
   return bestTCT;
 }
 
-int GRASP::TCT(std::vector<Task*> machine) {
+int GVNS::TCT(std::vector<Task*> machine) {
   int sum = 0;
   for (int i = 0; i < machine.size(); i++) {
     sum += C(machine, i);
@@ -406,7 +500,7 @@ int GRASP::TCT(std::vector<Task*> machine) {
   return sum;
 }
 
-int GRASP::C(std::vector<Task*> machine, int pos) {
+int GVNS::C(std::vector<Task*> machine, int pos) {
   int sum = machine[0]->getSetupTimeZero() + machine[0]->getProcessTime();
   for (int i = 0; i < pos; i++) {
     sum += machine[i]->getSetupTimeTo(machine[i + 1]->getId()) + machine[i + 1]->getProcessTime();
@@ -414,7 +508,7 @@ int GRASP::C(std::vector<Task*> machine, int pos) {
   return sum;
 }
 
-int GRASP::calculateZ(std::vector<Machine*>& solution) {
+int GVNS::calculateZ(std::vector<Machine*>& solution) {
   int z = 0;
   for (int i = 0; i < solution.size(); i++) {
     z += TCT(solution[i]->getTaskArray());
@@ -422,7 +516,7 @@ int GRASP::calculateZ(std::vector<Machine*>& solution) {
   return z;
 }
 
-void GRASP::printSolution(std::vector<Machine*>& solution) {
+void GVNS::printSolution(std::vector<Machine*>& solution) {
   int complexTime = 0;
   for (int i = 0; i < solution.size(); i++) {
     std::cout << "\tMáquina " << i + 1 << " (" << TCT(solution[i]->getTaskArray()) << ") : { ";
@@ -434,8 +528,3 @@ void GRASP::printSolution(std::vector<Machine*>& solution) {
   }
   std::cout << "\tTiempo total: " << complexTime << '\n';
 }
-
-void GRASP::setPostprocessingOption(int option) {
-  postprocessingOption_ = option;
-}
-

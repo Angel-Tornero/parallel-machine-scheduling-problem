@@ -16,6 +16,7 @@
 #include "../include/GreedyAlgorithm.h"
 #include "../include/NewGreedyAlgorithm.h"
 #include "../include/GRASP.h"
+#include "../include/GVNS.h"
 
 #include <chrono>
 
@@ -94,10 +95,10 @@ int main(int argc, char* argv[]) {
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
-  algorithm = new GRASP;
+  algorithm = new GVNS;
   std::cout << "- GVNS:\n"; 
   start = std::chrono::high_resolution_clock::now();
-  solution = ((GRASP*)algorithm)->solveGVNSNonFixedIterations(pmsp);
+  solution = ((GVNS*)algorithm)->solveFixedIterations(pmsp);
   stop = std::chrono::high_resolution_clock::now();
   elapsed = stop - start;
   std::cout << "\n- Mejorado:\n";
@@ -107,7 +108,7 @@ int main(int argc, char* argv[]) {
   delete algorithm;
   pmsp.setAllTasksAsUnassigned();
 
-  /*algorithm = new NewGreedyAlgorithm;
+  algorithm = new NewGreedyAlgorithm;
   start = std::chrono::high_resolution_clock::now();
   solution = algorithm->solve(pmsp);
   stop = std::chrono::high_resolution_clock::now();
@@ -149,7 +150,7 @@ int main(int argc, char* argv[]) {
     elapsed = stop - start;
     algorithm->printSolution(solution);
     std::cout << "\tTiempo de ejecución: " << elapsed.count() << " ms\n\n";
-  }*/
+  }
 
   return 1;
 }

@@ -8,26 +8,22 @@
   *
   * @author Ángel Tornero Hernández
   * @date 13 Abr 2021
-  * @file GRASP.h
+  * @file GVNS.cc
   *
   */
 
 #include "Strategy.h"
-#include "Machine.h"
-/**
- * @class Greedy Randomized Adaptative Search Procedures for Parallel Machine Scheduling Problem
- * with Dependent Setup Times
- * 
- */
-class GRASP: public Strategy {
-  private:
-    int postprocessingOption_;
+
+class GVNS: public Strategy {
   public:
-    GRASP();
-    ~GRASP()=default;
+    GVNS()=default;
+    ~GVNS()=default;
     std::vector<Machine*> solve(PMSProblem& pmsp);
     std::vector<Machine*> solveFixedIterations(PMSProblem& pmsp);
     std::vector<Machine*> solveNonFixedIterations(PMSProblem& pmsp);
+    std::vector<Machine*> generateRandomPoint(std::vector<Machine*> solution, int structure);
+    std::vector<Machine*> localSearchVND(std::vector<Machine*> solution, std::vector<int> lStructures);
+
     std::vector<Machine*> generateSolution(PMSProblem& pmsp);
     std::vector<Task*> selectShorterTasks(PMSProblem& pmsp);
     std::vector<Machine*> localSearch(std::vector<Machine*> initialSolution, int option);
@@ -48,8 +44,6 @@ class GRASP: public Strategy {
     int TCT(std::vector<Task*>);
     int calculateZ(std::vector<Machine*>& solution);
     int C(std::vector<Task*>, int pos);
+
     void printSolution(std::vector<Machine*>& solution);
-    
-    void setPostprocessingOption(int option);
-    void setStopCondition(int option);
 };
