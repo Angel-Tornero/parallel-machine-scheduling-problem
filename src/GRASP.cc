@@ -82,8 +82,7 @@ std::vector<Machine*> GRASP::generateSolution(PMSProblem& pmsp) {
 
 std::vector<Machine*> GRASP::localSearch(std::vector<Machine*> initialSolution, int option) {
   std::vector<Machine*> currentSolution = initialSolution;
-  std::vector<Machine*> bestSolution = currentSolution;
-  int bestZ = calculateZ(bestSolution);
+  int bestZ = calculateZ(currentSolution);
   do {
     std::vector<Machine*> bestNeighbour;
     switch (option) {
@@ -116,13 +115,12 @@ std::vector<Machine*> GRASP::localSearch(std::vector<Machine*> initialSolution, 
     int newZ = calculateZ(bestNeighbour);
     if (newZ < bestZ) {
       currentSolution = bestNeighbour;
-      bestSolution = currentSolution;
       bestZ = newZ;
     } else {
       break;
     }
   } while (true);
-  return bestSolution;
+  return currentSolution;
 }
 
 // greedy
