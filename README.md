@@ -12,7 +12,9 @@ The project was developed as part of a university assignment in 2021 and include
 
 ### 🔧 How to Run
 
+```bash
 $ ./main [problem file] [k value] [limit iterations]
+```
 
 - The problem files are stored in the `problems/` directory.  
 - `k value` is an integer for GRASP (should be less than the number of tasks).  
@@ -34,7 +36,7 @@ $ ./main [problem file] [k value] [limit iterations]
 
 Ángel Tornero Hernández 📧 angeltornerohdez@gmail.com  
 
-Project Link: [https://github.com/Angel-Tornero/parallel-machine-scheduling-solver](https://github.com/Angel-Tornero/parallel-machine-scheduling-solver)
+Project Link: [https://github.com/Angel-Tornero/parallel-machine-scheduling-solver-cpp](https://github.com/Angel-Tornero/parallel-machine-scheduling-solver-cpp)
 
 ---
 
